@@ -49,12 +49,13 @@ new processes after their environment is refreshed.
 
 ## Installation
 
+Both hosts install straight from this repository — no checkout required. `biggora/stitch-skills`
+is the GitHub shorthand, not a local path.
+
 ### Codex
 
-From a local checkout, add this repository as a marketplace:
-
 ```bash
-codex plugin marketplace add /path/to/stitch-skills
+codex plugin marketplace add biggora/stitch-skills
 codex plugin add stitch-skills@stitch
 ```
 
@@ -62,9 +63,6 @@ Verified with Codex CLI 0.154.0: the second command installs the plugin. If your
 host does not expose that command, open its plugin directory, select the **Google
 Stitch** marketplace, and install **stitch-skills**. Start a new conversation after
 installation so its skills and MCP tools are loaded.
-
-After these changes are published to GitHub, the marketplace can also be added with
-`codex plugin marketplace add biggora/stitch-skills`.
 
 The [Codex marketplace](.agents/plugins/marketplace.json) exposes the full toolkit as
 one plugin, using the existing repository root and `skills/` directory. Individual
@@ -95,10 +93,14 @@ Every entry ships the same `.mcp.json`, so the Stitch server is configured which
 Installing more than one à-la-carte entry is fine — they share one underlying directory, so
 nothing is duplicated on disk.
 
-#### Local development
+### Local development
+
+Only for working on the plugin itself, from a clone of this repository. Use a real path
+here — this is the one case where a local path is correct:
 
 ```bash
 claude --plugin-dir /path/to/stitch-skills
+codex plugin marketplace add /path/to/stitch-skills
 ```
 
 ### Manual, single-skill install
