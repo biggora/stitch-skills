@@ -1,6 +1,6 @@
 # stitch-skills
 
-Claude Code skills for designing UI with **Google Stitch** through the Stitch MCP server.
+Codex and Claude Code skills for designing UI with **Google Stitch** through the Stitch MCP server.
 
 Stitch generates screens and design systems from text. The MCP surface is small but full of
 sharp edges: identifiers are prefixed in some calls and bare in others, screen *instance* ids
@@ -19,9 +19,11 @@ encode those rules so the model gets them right the first time.
 | `stitch-iterate` | Targeted edits (`edit_screens`) and exploring alternatives (`generate_variants`). |
 | `stitch-to-code` | Turning a screen and its tokens into code that matches your project's actual stack. |
 
-Also included: a `stitch-batch-generator` subagent for generating several screens in sequence
-without long waits in the main conversation, and a settings template at
+Also included: a Claude Code `stitch-batch-generator` subagent for generating several screens
+in sequence, and a settings template at
 [`examples/stitch.local.md`](examples/stitch.local.md).
+Codex runs multi-screen generation through `stitch-screens`, with a progress ledger in the
+current conversation; it does not load the Claude Code agent.
 
 ## Prerequisites
 
@@ -37,11 +39,39 @@ On Windows (PowerShell):
 [Environment]::SetEnvironmentVariable("STITCH_API_KEY", "your-key-here", "User")
 ```
 
-The bundled [`.mcp.json`](.mcp.json) reads the key from this variable. **No key is stored in
-this repository.** Set the variable before starting Claude Code, or the `stitch` MCP server
-will fail to authenticate.
+Claude Code's [`.mcp.json`](.mcp.json) reads the key from this variable. Codex's
+[manifest](.codex-plugin/plugin.json) uses `env_http_headers` to read the same variable,
+with a 600-second tool timeout for long-running generation. **No key is stored in this
+repository.** Set the variable before starting your host, or the `stitch` MCP server will
+fail to authenticate. In PowerShell, use `$env:STITCH_API_KEY = "your-key-here"` as well
+if launching the host from the current shell; the persistent User setting applies to
+new processes after their environment is refreshed.
 
 ## Installation
+
+### Codex
+
+From a local checkout, add this repository as a marketplace:
+
+```bash
+codex plugin marketplace add /path/to/stitch-skills
+codex plugin add stitch-skills@stitch
+```
+
+Verified with Codex CLI 0.154.0: the second command installs the plugin. If your
+host does not expose that command, open its plugin directory, select the **Google
+Stitch** marketplace, and install **stitch-skills**. Start a new conversation after
+installation so its skills and MCP tools are loaded.
+
+After these changes are published to GitHub, the marketplace can also be added with
+`codex plugin marketplace add biggora/stitch-skills`.
+
+The [Codex marketplace](.agents/plugins/marketplace.json) exposes the full toolkit as
+one plugin, using the existing repository root and `skills/` directory. Individual
+plugin entries below are specific to Claude Code. This uses the supported Codex
+compatibility manifest format; see the [OpenAI packaging documentation](https://developers.openai.com/plugins/build/plugins).
+
+### Claude Code
 
 Add the marketplace once:
 
@@ -65,7 +95,7 @@ Every entry ships the same `.mcp.json`, so the Stitch server is configured which
 Installing more than one à-la-carte entry is fine — they share one underlying directory, so
 nothing is duplicated on disk.
 
-### Local development
+#### Local development
 
 ```bash
 claude --plugin-dir /path/to/stitch-skills
@@ -80,6 +110,8 @@ copied straight into your personal skills directory:
 cp -r skills/stitch-screens ~/.claude/skills/stitch-screens
 ```
 
+For Codex, copy it to `~/.agents/skills/stitch-screens` instead.
+
 You must then configure the `stitch` MCP server yourself — the manual copy does not bring
 `.mcp.json` with it.
 
@@ -88,12 +120,20 @@ You must then configure the `stitch` MCP server yourself — the manual copy doe
 Copy the template into any project where you use Stitch:
 
 ```bash
+# Codex
+mkdir -p .codex
+cp examples/stitch.local.md .codex/stitch.local.md
+
+# Claude Code
+mkdir -p .claude
 cp examples/stitch.local.md .claude/stitch.local.md
 ```
 
 Fill in the project id and design system id so you stop repeating them in every request. The
-file is git-ignored by convention (`.claude/*.local.md`) and holds no secrets — the API key
-stays in the environment.
+file holds no secrets — the API key stays in the environment. Add `.codex/*.local.md`
+or `.claude/*.local.md` to the consuming project's `.gitignore`. Codex also reads an
+existing `.claude/stitch.local.md` when its `.codex/` counterpart is absent; if both
+exist, each host uses its own file.
 
 ## Usage
 

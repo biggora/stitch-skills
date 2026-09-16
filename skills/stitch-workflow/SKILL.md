@@ -42,9 +42,9 @@ Track these values for the duration of the session. All of them are plain string
 
 **Do not trust memory of these ids across a long session.** Screens and instances can change between turns (new screens generated, variants created, edits applied). Before any call that needs a screen id, screen instance id, or the current screen list, re-read the current state with `get_project` (for instances) or `list_screens` (for the screen roster) rather than reusing values you tracked earlier in the conversation.
 
-## Session config: `.claude/stitch.local.md`
+## Session config
 
-Before starting work, check whether `${CLAUDE_PROJECT_DIR}/.claude/stitch.local.md` exists.
+Before starting work, check for `stitch.local.md` in the consuming project's host settings directory: `.codex/` for Codex, `.claude/` for Claude Code. Resolve paths from the project root supplied by the host, or the current working directory; do not require `CLAUDE_PROJECT_DIR`. In Codex, fall back to `.claude/stitch.local.md` if `.codex/stitch.local.md` is absent, so existing project settings remain usable. If both exist, use only the host's file.
 
 - **If it exists**, read it and use its contents as session defaults: `projectId`, `designSystemAssetId`, `deviceType`, `modelId`. Treat these as defaults, not overrides — if the user names a different project or device type explicitly, honor what they said instead.
 - **If it does not exist**, do not create it silently. Once a project and design system are established in this session, offer to write one (with the resolved `projectId`, `designSystemAssetId`, `deviceType`, and, if chosen, `modelId`) so future sessions can skip re-resolving them. Only write it if the user agrees.
@@ -73,4 +73,4 @@ If a call appears to hang or the connection drops, do not retry it: retrying a l
 - Reusing a `projectId`, screen id, or screen instance id from earlier in the conversation without re-verifying it against a fresh `get_project`/`list_screens` call, especially after any generation, edit, or variant step that could have changed the project's screen list.
 - Passing a source screen id where `apply_design_system` or `create_design_system_from_design_md` expects a screen instance id (`{id, sourceScreen}`) — see `stitch-projects` (if installed) for the full identifier reference.
 - Retrying a `generate_screen_from_text`, `edit_screens`, or `generate_variants` call after a timeout or dropped connection instead of polling `get_screen` to check whether it already succeeded.
-- Silently creating `.claude/stitch.local.md` without asking, or ignoring it when it already exists.
+- Silently creating the host's `stitch.local.md` without asking, or ignoring it when it already exists.

@@ -15,7 +15,7 @@ Work through the five steps below, in order. Do not skip Step 1 to save time —
 
 Before touching the Stitch MCP tools, read the target project to determine what you're generating code into. Do this even if the user names a framework — their description is often incomplete (they say "React" and mean "Next.js App Router with shadcn/ui and Tailwind v4"), and only reading the files gives you the details that matter for matching conventions.
 
-1. **Read `package.json`** at the project root (use `${CLAUDE_PROJECT_DIR}` if you need an absolute path, or the working directory the user is already in). Check `dependencies` and `devDependencies` for:
+1. **Read `package.json`** at the consuming project root supplied by the host, or the working directory the user is already in. Do not require a host-specific environment variable. Check `dependencies` and `devDependencies` for:
    - `react`, `next` → React or Next.js (check for `next` specifically; a project can have `react` without `next`)
    - `vue`, `nuxt` → Vue or Nuxt
    - `svelte`, `@sveltejs/kit` → Svelte or SvelteKit

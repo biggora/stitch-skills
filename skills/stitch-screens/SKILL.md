@@ -56,6 +56,8 @@ Optional enum: `MODEL_ID_UNSPECIFIED | GEMINI_3_8_FLASH | GEMINI_3_5_FLASH_LITE`
 
 ## Multi-screen flows
 
+In Codex, the Claude Code agent at `agents/stitch-batch-generator.md` is not registered as a custom agent. Run the multi-screen procedure below in the current conversation. Keep a ledger with each requested screen's label, observed screen id, and status (`pending`, `generating`, `succeeded`, `failed`, or `unconfirmed`), updating it after each actual result. Return that ledger as a table and attribute any `output_components` text or suggestions to the screen that produced them. If interrupted, report the observed status of the in-flight screen and leave unstarted screens `pending`.
+
 When a request calls for more than one screen (e.g. "generate a login screen and a dashboard"), generate them one at a time — there is no batch form of `generate_screen_from_text`. For each call:
 
 - Reuse the same `designSystem` and `deviceType` resolved during pre-flight so the whole set stays visually consistent.

@@ -2,6 +2,7 @@
 node_modules/
 
 # Per-project Stitch settings live here and are never committed.
-# Copy examples/stitch.local.md to .claude/stitch.local.md in the consuming project.
+# Copy examples/stitch.local.md to the host's .claude/ or .codex/ directory.
 .claude/*.local.md
+.codex/*.local.md
 /.env

@@ -1,13 +1,13 @@
 <!--
   TEMPLATE — this is documentation, not live configuration.
 
-  Copy this file to `.claude/stitch.local.md` inside the project that consumes
-  the Stitch skills, then fill in the values for that project. The `.claude/*.local.md`
-  glob is git-ignored by convention (see this repository's own `.gitignore`), so a
-  copy placed there is never committed and is local to your machine/checkout.
+  Copy this file to `.codex/stitch.local.md` for Codex or `.claude/stitch.local.md`
+  for Claude Code inside the consuming project, then fill in its values. Add the
+  corresponding `.codex/*.local.md` or `.claude/*.local.md` pattern to that
+  project's .gitignore to keep the settings local to your machine/checkout.
 
   This file contains NO secrets. The Stitch MCP server authenticates with the
-  STITCH_API_KEY environment variable (see .mcp.json's "X-Goog-Api-Key" header) —
+  STITCH_API_KEY environment variable (see the plugin's MCP configuration) —
   never put an API key, token, or credential in this file. Everything below is
   non-secret project metadata: ids, enum choices, and a stack override.
 
