@@ -49,7 +49,7 @@ is the GitHub shorthand, not a local path.
 
 ```bash
 codex plugin marketplace add biggora/stitch-skills
-codex plugin add stitch-skills@stitch
+codex plugin add stitch-skills@stitch-skills
 ```
 
 Verified with Codex CLI 0.154.0: these GitHub commands install the plugin, and Codex
@@ -78,7 +78,7 @@ Add the marketplace once:
 Then install the plugin:
 
 ```text
-/plugin install stitch-skills@stitch
+/plugin install stitch-skills@stitch-skills
 ```
 
 The root `.mcp.json` remains canonical. If MCP is not auto-loaded, configure `/mcp` with
@@ -95,13 +95,13 @@ Add the marketplace once:
 Then install **everything**:
 
 ```bash
-/plugin install stitch-skills@stitch
+/plugin install stitch-skills@stitch-skills
 ```
 
 …or **only the skills you want**:
 
 ```bash
-/plugin install stitch-screens@stitch
+/plugin install stitch-screens@stitch-skills
 ```
 
 Every entry ships the same `.mcp.json`, so the Stitch server is configured whichever you pick.
