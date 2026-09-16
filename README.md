@@ -108,6 +108,32 @@ Every entry ships the same `.mcp.json`, so the Stitch server is configured which
 Installing more than one à-la-carte entry is fine — they share one underlying directory, so
 nothing is duplicated on disk.
 
+### npx skills (any agent)
+
+Skills also install individually via the open-source [`skills`](https://github.com/vercel-labs/skills)
+CLI, straight from this repository — no checkout required:
+
+```bash
+npx skills add https://github.com/biggora/stitch-skills --skill stitch-screens
+```
+
+`--skill` repeats for more than one:
+
+```bash
+npx skills add https://github.com/biggora/stitch-skills --skill stitch-design-system --skill stitch-screens
+```
+
+Skills land in `./.claude/skills/<name>/` by default, `references/` included; add `-g` to
+install to `~/.claude/skills/` instead. This is the route for agents beyond Claude Code and
+Codex — Cursor, Gemini CLI, Zed, opencode, and 75+ others — since the tool detects the host
+itself (its `--agent` flag, if you set it explicitly, wants `claude-code`, not `claude`).
+
+> **Configure MCP yourself.** `npx skills` installs skill files only, not `.mcp.json`. Every
+> skill here calls `mcp__stitch__*` tools, so without the `stitch` MCP server configured — URL
+> `https://stitch.googleapis.com/mcp`, header `X-Goog-Api-Key: ${STITCH_API_KEY}` — an installed
+> skill has instructions but nothing to act with. The marketplace and Codex routes above
+> configure this for you automatically; this one does not.
+
 ### Local development
 
 Only for working on the plugin itself. Clone the repository and load the development
@@ -122,17 +148,17 @@ codex plugin marketplace add .
 
 ### Manual, single-skill install
 
-This optional method requires a clone and manual MCP configuration. From the repository
-root, each self-contained skill directory can be copied into your personal skills directory:
+The same idea without Node tooling. It needs a clone (`npx skills` above works straight
+from the URL and is the better-supported option), and keeps no lock file or update record.
+From the repository root, each self-contained skill directory can be copied into your
+personal skills directory:
 
 ```bash
 cp -r skills/stitch-screens ~/.claude/skills/stitch-screens
 ```
 
-For Codex, copy it to `~/.agents/skills/stitch-screens` instead.
-
-You must then configure the `stitch` MCP server yourself — the manual copy does not bring
-`.mcp.json` with it.
+For Codex, copy it to `~/.agents/skills/stitch-screens` instead. Same caveat as `npx skills`:
+this brings no `.mcp.json` — configure the `stitch` MCP server yourself.
 
 ## Per-project settings
 

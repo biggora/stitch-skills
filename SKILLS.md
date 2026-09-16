@@ -201,6 +201,18 @@ The file holds no secrets — the Stitch MCP server authenticates through the `S
 
 Every entry ships the same `.mcp.json`, so installing any one configures the `stitch` MCP server. The `stitch-batch-generator` agent is only declared on the `stitch-skills` entry, but agents under `agents/` in an installed plugin are auto-discovered, so it appears even in a single-skill install. See [`README.md`](README.md) for install commands.
 
+### Marketplace vs. `npx skills`
+
+| | Marketplace (`/plugin install`) | `npx skills add` |
+|---|---|---|
+| MCP server | Configured automatically — every entry ships `.mcp.json` | Not configured — set up `stitch` by hand |
+| Install location | Plugin cache, managed by the host | `./.claude/skills/` (or `~/.claude/skills/` with `-g`) |
+| Updates | `/plugin update`, tracked by the marketplace | Re-run the command; tracked via `skills-lock.json` |
+| Agents supported | Claude Code (Codex and Copilot CLI via their own marketplace routes) | 75+ agents — Cursor, Gemini CLI, Zed, opencode, and more |
+| `stitch-batch-generator` subagent | Included, auto-discovered from `agents/` | Not installed — `npx skills` installs skills only |
+
+For Claude Code, the marketplace remains the default: it wires the MCP server and the subagent with zero extra steps. Reach for `npx skills` only when targeting an agent the marketplace routes don't cover, and budget time to configure the `stitch` MCP server by hand.
+
 ## Appendix — verified API behaviour
 
 These four points were established by probing the live Stitch API on **2026-09-16**. Each corrects a natural but wrong assumption.
