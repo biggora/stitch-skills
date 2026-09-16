@@ -1,6 +1,6 @@
 {
   "name": "stitch-skills",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Skills for designing UI with Google Stitch via the Stitch MCP server: projects, design systems, screen generation, iteration, and handoff to real code.",
   "author": {
     "name": "Aleksejs Gordejevs",
@@ -8,7 +8,14 @@
   },
   "repository": "https://github.com/biggora/stitch-skills",
   "license": "MIT",
-  "keywords": ["stitch", "google-stitch", "ui-design", "design-system", "mcp", "prototyping"],
+  "keywords": [
+    "stitch",
+    "google-stitch",
+    "ui-design",
+    "design-system",
+    "mcp",
+    "prototyping"
+  ],
   "skills": "./skills/",
   "mcpServers": {
     "stitch": {
@@ -25,7 +32,10 @@
     "longDescription": "Create projects and design systems, generate and refine screens, and implement finished designs against your project's actual stack.",
     "developerName": "Aleksejs Gordejevs",
     "category": "Productivity",
-    "capabilities": ["Read", "Write"],
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
     "websiteURL": "https://github.com/biggora/stitch-skills",
     "defaultPrompt": [
       "Design a mobile onboarding flow with Google Stitch.",
