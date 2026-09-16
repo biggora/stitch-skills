@@ -67,6 +67,23 @@ one plugin, using the existing repository root and `skills/` directory. Individu
 plugin entries below are specific to Claude Code. This uses the supported Codex
 compatibility manifest format; see the [OpenAI packaging documentation](https://developers.openai.com/plugins/build/plugins).
 
+### GitHub Copilot CLI
+
+Add the marketplace once:
+
+```text
+/plugin marketplace add biggora/stitch-skills
+```
+
+Then install the plugin:
+
+```text
+/plugin install stitch-skills@stitch
+```
+
+The root `.mcp.json` remains canonical. If MCP is not auto-loaded, configure `/mcp` with
+URL `https://stitch.googleapis.com/mcp` and header `X-Goog-Api-Key: ${STITCH_API_KEY}`.
+
 ### Claude Code
 
 Add the marketplace once:

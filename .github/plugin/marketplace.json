@@ -1,0 +1,9 @@
+{
+  "plugins": [
+    {
+      "name": "stitch-skills",
+      "description": "Google Stitch design skills for UI workflows, design systems, screens, iteration, and handoff.",
+      "source": { "type": "github", "owner": "biggora", "repo": "stitch-skills" }
+    }
+  ]
+}
