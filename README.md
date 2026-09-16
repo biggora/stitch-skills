@@ -47,6 +47,9 @@ fail to authenticate. In PowerShell, use `$env:STITCH_API_KEY = "your-key-here"`
 if launching the host from the current shell; the persistent User setting applies to
 new processes after their environment is refreshed.
 
+If you store the key in a project `.env`, load `STITCH_API_KEY` into the host's process
+environment before launching it. The plugin does not automatically load `.env` files.
+
 ## Installation
 
 Both hosts install straight from this repository — no checkout required. `biggora/stitch-skills`
@@ -59,10 +62,15 @@ codex plugin marketplace add biggora/stitch-skills
 codex plugin add stitch-skills@stitch
 ```
 
-Verified with Codex CLI 0.154.0: the second command installs the plugin. If your
-host does not expose that command, open its plugin directory, select the **Google
+Verified with Codex CLI 0.154.0: these GitHub commands install the plugin, and Codex
+loads all six bundled skills from the installed cache. If your host does not expose
+the install command, open its plugin directory, select the **Google
 Stitch** marketplace, and install **stitch-skills**. Start a new conversation after
 installation so its skills and MCP tools are loaded.
+
+Live Google Stitch access was also verified with a key loaded from `.env`: discovery
+of all 15 MCP tools and a successful read-only `list_projects` call. Screen generation
+was not exercised by this check.
 
 The [Codex marketplace](.agents/plugins/marketplace.json) exposes the full toolkit as
 one plugin, using the existing repository root and `skills/` directory. Individual
@@ -95,18 +103,20 @@ nothing is duplicated on disk.
 
 ### Local development
 
-Only for working on the plugin itself, from a clone of this repository. Use a real path
-here — this is the one case where a local path is correct:
+Only for working on the plugin itself. Clone the repository and load the development
+copy from its root; regular installation uses the GitHub commands above:
 
 ```bash
-claude --plugin-dir /path/to/stitch-skills
-codex plugin marketplace add /path/to/stitch-skills
+git clone https://github.com/biggora/stitch-skills.git
+cd stitch-skills
+claude --plugin-dir .
+codex plugin marketplace add .
 ```
 
 ### Manual, single-skill install
 
-Each skill directory is self-contained and uses no plugin-relative paths, so it also works
-copied straight into your personal skills directory:
+This optional method requires a clone and manual MCP configuration. From the repository
+root, each self-contained skill directory can be copied into your personal skills directory:
 
 ```bash
 cp -r skills/stitch-screens ~/.claude/skills/stitch-screens
@@ -119,16 +129,17 @@ You must then configure the `stitch` MCP server yourself — the manual copy doe
 
 ## Per-project settings
 
-Copy the template into any project where you use Stitch:
+Download the template from this repository into the project where you use Stitch.
+No plugin checkout is required:
 
 ```bash
 # Codex
 mkdir -p .codex
-cp examples/stitch.local.md .codex/stitch.local.md
+curl -fsSL https://raw.githubusercontent.com/biggora/stitch-skills/main/examples/stitch.local.md -o .codex/stitch.local.md
 
 # Claude Code
 mkdir -p .claude
-cp examples/stitch.local.md .claude/stitch.local.md
+curl -fsSL https://raw.githubusercontent.com/biggora/stitch-skills/main/examples/stitch.local.md -o .claude/stitch.local.md
 ```
 
 Fill in the project id and design system id so you stop repeating them in every request. The
