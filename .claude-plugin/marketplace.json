@@ -6,13 +6,13 @@
   },
   "metadata": {
     "description": "Google Stitch design skills — install the full toolkit or pick individual skills",
-    "version": "0.1.0"
+    "version": "0.2.0"
   },
   "plugins": [
     {
       "name": "stitch-skills",
-      "description": "Full Google Stitch toolkit: projects, design systems, screen generation, iteration, and handoff to code",
-      "version": "0.1.0",
+      "description": "Full Google Stitch toolkit: projects, design systems, screens, iteration, component slicing, Storybook, and handoff to code",
+      "version": "0.2.0",
       "author": {
         "name": "Aleksejs Gordejevs",
         "email": "agbiggora@gmail.com"
@@ -27,6 +27,8 @@
         "./skills/stitch-design-system",
         "./skills/stitch-screens",
         "./skills/stitch-iterate",
+        "./skills/stitch-components",
+        "./skills/stitch-storybook",
         "./skills/stitch-to-code"
       ],
       "agents": [
@@ -36,7 +38,7 @@
     {
       "name": "stitch-workflow",
       "description": "End-to-end Google Stitch workflow orchestration: which tool to call, in what order, with what state",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "author": {
         "name": "Aleksejs Gordejevs",
         "email": "agbiggora@gmail.com"
@@ -52,7 +54,7 @@
     {
       "name": "stitch-projects",
       "description": "Create, list, inspect, and delete Google Stitch projects, and resolve project/screen/instance identifiers",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "author": {
         "name": "Aleksejs Gordejevs",
         "email": "agbiggora@gmail.com"
@@ -67,8 +69,8 @@
     },
     {
       "name": "stitch-design-system",
-      "description": "Build and apply Google Stitch design systems: theme tokens, fonts, color variants, and the DESIGN.md pipeline",
-      "version": "0.1.0",
+      "description": "Build, apply, and export Google Stitch design systems: theme tokens, fonts, DESIGN.md in and out",
+      "version": "0.2.0",
       "author": {
         "name": "Aleksejs Gordejevs",
         "email": "agbiggora@gmail.com"
@@ -84,7 +86,7 @@
     {
       "name": "stitch-screens",
       "description": "Generate Google Stitch screens from text prompts and survive the long-running generation protocol",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "author": {
         "name": "Aleksejs Gordejevs",
         "email": "agbiggora@gmail.com"
@@ -100,7 +102,7 @@
     {
       "name": "stitch-iterate",
       "description": "Refine existing Google Stitch screens with targeted edits and explore alternatives with design variants",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "author": {
         "name": "Aleksejs Gordejevs",
         "email": "agbiggora@gmail.com"
@@ -114,9 +116,41 @@
       ]
     },
     {
+      "name": "stitch-components",
+      "description": "Download a Google Stitch screen HTML and slice it into reusable framework components",
+      "version": "0.2.0",
+      "author": {
+        "name": "Aleksejs Gordejevs",
+        "email": "agbiggora@gmail.com"
+      },
+      "license": "MIT",
+      "source": "./",
+      "strict": false,
+      "mcpServers": "./.mcp.json",
+      "skills": [
+        "./skills/stitch-components"
+      ]
+    },
+    {
+      "name": "stitch-storybook",
+      "description": "Set up Storybook, register Stitch components as stories, and compose pages from them",
+      "version": "0.2.0",
+      "author": {
+        "name": "Aleksejs Gordejevs",
+        "email": "agbiggora@gmail.com"
+      },
+      "license": "MIT",
+      "source": "./",
+      "strict": false,
+      "mcpServers": "./.mcp.json",
+      "skills": [
+        "./skills/stitch-storybook"
+      ]
+    },
+    {
       "name": "stitch-to-code",
       "description": "Turn Google Stitch screens and design tokens into production code that matches the host project stack",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "author": {
         "name": "Aleksejs Gordejevs",
         "email": "agbiggora@gmail.com"

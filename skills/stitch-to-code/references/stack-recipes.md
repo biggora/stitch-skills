@@ -36,13 +36,17 @@ Any `--color-*`, `--font-*`, `--radius-*`, or `--spacing-*` variable declared in
   --font-headline: "Space Grotesk", sans-serif;
   --font-body: "Inter", sans-serif;
 
-  /* radius — from roundness: ROUND_TWELVE */
-  --radius-md: 12px;
-  --radius-lg: 16px; /* project may want a larger companion step; not from Stitch directly */
+  /* radius — from roundness: ROUND_TWELVE. This is the measured ROUND_TWELVE scale
+     (see "roundness → radius scale" near the end of this file); prefer reading
+     theme.extend.borderRadius from the screen's own tailwind-config when available. */
+  --radius: 8px;       /* DEFAULT */
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
 }
 ```
 
-Use it in markup as ordinary Tailwind utilities: `className="bg-primary text-primary-foreground rounded-md font-headline"`.
+Use it in markup as ordinary Tailwind utilities: `className="bg-primary text-primary-foreground rounded font-headline"` (`rounded` maps to the unsuffixed `--radius` / `DEFAULT` step; use `rounded-lg`, `rounded-xl`, or `rounded-full` for the other three steps).
 
 **Dark mode (`colorMode: DARK` on a project that wants both modes):** Tailwind v4 dropped the old `darkMode: 'class'` config key. Define a custom variant once, then override the same `--color-*` variables under it:
 
@@ -90,14 +94,20 @@ export default {
         body: ["Inter", "sans-serif"],
       },
       borderRadius: {
-        md: "12px", // roundness: ROUND_TWELVE
+        // roundness: ROUND_TWELVE — this is the measured ROUND_TWELVE scale (see
+        // "roundness → radius scale" near the end of this file); prefer reading
+        // theme.extend.borderRadius from the screen's own tailwind-config when available.
+        DEFAULT: "8px",
+        lg: "16px",
+        xl: "24px",
+        full: "9999px",
       },
     },
   },
 } satisfies Config;
 ```
 
-Usage is identical at the class-name level to v3's always-been-standard form: `className="bg-primary text-primary-foreground rounded-md font-headline"`.
+Usage is identical at the class-name level to v3's always-been-standard form: `className="bg-primary text-primary-foreground rounded font-headline"` (`rounded-lg`, `rounded-xl`, `rounded-full` for the other three steps).
 
 For `colorMode: DARK`, either flip `darkMode` handling at the app root (add/remove a `dark` class on `<html>`) or, if the project already manages this, don't touch the mechanism — just make sure the new `primary`/`secondary` colors have sensible dark-mode companions defined via `dark:` variants or CSS variables referenced from the Tailwind config's `colors`.
 
@@ -158,7 +168,7 @@ shadcn/ui themes through CSS custom properties, not Tailwind config colors direc
   --border: 240 6% 90%;
   --input: 240 6% 90%;
   --ring: 243 75% 59%;
-  --radius: 0.75rem;             /* roundness: ROUND_TWELVE → 12px; not shadcn's current default of 0.625rem — this value is derived from the Stitch roundness token, so it is correct here, not a mistake */
+  --radius: 1rem;                /* roundness: ROUND_TWELVE → lg is 1rem (16px), per the measured scale below; not shadcn's current default of 0.625rem — this value is derived from the Stitch roundness token, so it is correct here, not a mistake */
 }
 
 .dark {
@@ -178,7 +188,7 @@ shadcn/ui themes through CSS custom properties, not Tailwind config colors direc
   --foreground: oklch(0.15 0 0);
   --primary: oklch(0.51 0.23 277);   /* from customColor #4f46e5 */
   --primary-foreground: oklch(1 0 0);
-  --radius: 0.75rem;                 /* roundness: ROUND_TWELVE → 12px */
+  --radius: 1rem;                    /* roundness: ROUND_TWELVE → lg is 1rem (16px), per the measured scale below */
 }
 
 @theme inline {
@@ -321,7 +331,9 @@ For `colorMode: DARK` support, add a `[data-theme="dark"]` or `.dark` block re-d
 
 ## Font-loading table
 
-Stitch's font enum values map to real Google Fonts family names. The table below covers the 12 faces most likely to appear. **For any enum not in this table, derive the family name mechanically:** replace underscores with spaces and title-case each word (`SPLINE_SANS` → "Spline Sans", `HANKEN_GROTESK` → "Hanken Grotesk"). Known exceptions that do not title-case cleanly: `EB_GARAMOND` → "EB Garamond", `IBM_PLEX_SANS` → "IBM Plex Sans", `IBM_PLEX_SERIF` → "IBM Plex Serif", `DM_SANS` → "DM Sans", `SOURCE_SERIF_4` → "Source Serif 4", `SOURCE_SANS_3` → "Source Sans 3". For the `next/font/google` import name, use the same family name with spaces replaced by underscores (`Plus Jakarta Sans` → `Plus_Jakarta_Sans`). If the `stitch-design-system` skill is also installed, its enum reference has the authoritative 68-value list — but do not block on it; the derivation above is sufficient.
+**Read the resolved family name first.** `get_project`'s `designTheme` returns `bodyFontFamily`, `headlineFontFamily`, and `labelFontFamily` as real CSS family names (observed values include `"Inter"` and `"Newsreader"`) — use these directly, they need no further derivation.
+
+**Fallback — derive the family name from the enum only when a resolved `*FontFamily` field is missing.** Stitch's font enum values (`headlineFont` / `bodyFont` / `labelFont`, e.g. `INTER`, `SPACE_GROTESK`) map to real Google Fonts family names. The table below covers the 12 faces most likely to appear. For any enum not in this table, derive the family name mechanically: replace underscores with spaces and title-case each word (`SPLINE_SANS` → "Spline Sans", `HANKEN_GROTESK` → "Hanken Grotesk"). Known exceptions that do not title-case cleanly: `EB_GARAMOND` → "EB Garamond", `IBM_PLEX_SANS` → "IBM Plex Sans", `IBM_PLEX_SERIF` → "IBM Plex Serif", `DM_SANS` → "DM Sans", `SOURCE_SERIF_4` → "Source Serif 4", `SOURCE_SANS_3` → "Source Sans 3". For the `next/font/google` import name, use the same family name with spaces replaced by underscores (`Plus Jakarta Sans` → `Plus_Jakarta_Sans`). If the `stitch-design-system` skill is also installed, its enum reference has the authoritative 68-value list — but do not block on it; the derivation above is sufficient.
 
 | Stitch enum | Google Fonts family | `next/font/google` import | `<link>` snippet | CSS `@import` |
 |---|---|---|---|---|
@@ -346,15 +358,83 @@ Notes:
 
 ---
 
+## Resolved tokens from `designTheme`: `namedColors` and `typography`
+
+When `get_project`'s `designTheme` includes `namedColors` and `typography`, convert them directly — they're already resolved values, not enums to map. `namedColors` is a flat snake_case→hex object (47 entries in a typical project); `typography` is a set of named levels, each `{fontFamily, fontSize, fontWeight, letterSpacing, lineHeight}`. Worked example using real observed values:
+
+```json
+"namedColors": {
+  "background": "#f7f9fb",
+  "error": "#ba1a1a",
+  "error_container": "#ffdad6",
+  "inverse_on_surface": "#eff1f3"
+},
+"typography": {
+  "body-lg": {
+    "fontFamily": "Newsreader",
+    "fontSize": "20px",
+    "fontWeight": "400",
+    "letterSpacing": "-0.005em",
+    "lineHeight": "32px"
+  }
+}
+```
+
+**(a) Tailwind v4 `@theme` entries** — snake_case keys become kebab-case `--color-*` variables; a typography level becomes a matching set of `--text-*` / `--font-*` entries:
+
+```css
+@theme {
+  --color-background: #f7f9fb;
+  --color-error: #ba1a1a;
+  --color-error-container: #ffdad6;
+  --color-inverse-on-surface: #eff1f3;
+
+  --font-body-lg: "Newsreader", serif;
+  --text-body-lg: 20px;
+  --text-body-lg--line-height: 32px;
+  --text-body-lg--font-weight: 400;
+  --text-body-lg--letter-spacing: -0.005em;
+}
+```
+
+**(b) Plain CSS custom properties** — same values, no Tailwind-specific naming convention required:
+
+```css
+:root {
+  --color-background: #f7f9fb;
+  --color-error: #ba1a1a;
+  --color-error-container: #ffdad6;
+  --color-inverse-on-surface: #eff1f3;
+
+  --font-body-lg: "Newsreader", serif;
+  --size-body-lg: 20px;
+  --line-height-body-lg: 32px;
+  --weight-body-lg: 400;
+  --tracking-body-lg: -0.005em;
+}
+```
+
+Apply the same pattern to every `namedColors` entry and every `typography` level actually used by the screen being translated — don't pre-generate tokens for values nothing references.
+
+---
+
 ## `roundness` → radius scale
 
-| Stitch enum | Pixel value | Typical scale name |
-|---|---|---|
-| `ROUND_FOUR` | 4px | `xs` |
-| `ROUND_EIGHT` | 8px | `sm` |
-| `ROUND_TWELVE` | 12px | `md` |
-| `ROUND_FULL` | 9999px | `full` (pill / circular) |
-| `ROUND_TWO` | — | **Deprecated.** Treat as `ROUND_FOUR` and flag the substitution. |
+`roundness` selects a **four-step border-radius scale**, not a single value. Each generated screen embeds `<script id="tailwind-config">tailwind.config={...}</script>`, and `theme.extend.borderRadius` inside it is the authoritative, already-resolved scale for that project — **read it from the screen when one is available.** The table below is the fallback for when no generated screen is at hand; it was measured 2026-09-16 from `theme.extend.borderRadius` on one screen from each of three real Stitch projects whose `roundness` differed:
+
+| `roundness` | `DEFAULT` | `lg` | `xl` | `full` |
+|---|---|---|---|---|
+| `ROUND_FOUR` | 0.125rem (2px) | 0.25rem (4px) | 0.5rem (8px) | 0.75rem (12px) |
+| `ROUND_EIGHT` | 0.25rem (4px) | 0.5rem (8px) | 0.75rem (12px) | 9999px |
+| `ROUND_TWELVE` | 0.5rem (8px) | 1rem (16px) | 1.5rem (24px) | 9999px |
+| `ROUND_FULL` | not observed — no sample project used it; read the screen's own `tailwind-config` instead of guessing | | | |
+| `ROUND_TWO` | — | — | — | **Deprecated.** Treat as `ROUND_FOUR` and flag the substitution. |
+
+Three things to watch for:
+
+- **The enum name matches the `lg` step, not a global radius.** `ROUND_FOUR` → `lg` is 4px; `ROUND_EIGHT` → `lg` is 8px.
+- **`ROUND_TWELVE` does not produce a 12px radius.** Its `lg` is 16px; 12px appears only as `ROUND_EIGHT`'s `xl`.
+- **`rounded-full` is not always a pill.** Under `ROUND_FOUR` it resolves to 12px, not `9999px`. Only `ROUND_EIGHT` and `ROUND_TWELVE` make `full` a true pill in this sample.
 
 ## `colorVariant` → palette-generation strategy
 

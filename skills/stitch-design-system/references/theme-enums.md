@@ -102,14 +102,18 @@ Condensed (space-efficient, headline/label use): `ARCHIVO_NARROW`, `BARLOW_CONDE
 
 ## `roundness`
 
-| Enum value | Meaning |
-|---|---|
-| `ROUNDNESS_UNSPECIFIED` | Unset; Stitch chooses a default |
-| `ROUND_TWO` | **Deprecated, unused** — do not use |
-| `ROUND_FOUR` | Small corner radius; sharp/precise feel. Smallest concrete value available |
-| `ROUND_EIGHT` | Medium corner radius; standard modern UI default |
-| `ROUND_TWELVE` | Large corner radius ("Round 12 or full" per tool docs) |
-| `ROUND_FULL` | Fully rounded / pill-shaped corners |
+`roundness` selects a **four-step border-radius scale** (`DEFAULT`, `lg`, `xl`, `full`), not a single pixel value. The enum name approximates the scale's `lg` step — it is not the radius applied everywhere. The most reliable source for the actual values is a generated screen's own inline `<script id="tailwind-config">` — read `theme.extend.borderRadius` from it directly. The table below is the fallback, measured 2026-09-16 from `theme.extend.borderRadius` on one screen from each of three real Stitch projects:
+
+| Enum value | Meaning | `DEFAULT` | `lg` | `xl` | `full` |
+|---|---|---|---|---|---|
+| `ROUNDNESS_UNSPECIFIED` | Unset; Stitch chooses a default | — | — | — | — |
+| `ROUND_TWO` | **Deprecated, unused** — do not use | — | — | — | — |
+| `ROUND_FOUR` | Small corner radius; sharp/precise feel. Smallest concrete value available | 0.125rem (2px) | 0.25rem (4px) | 0.5rem (8px) | 0.75rem (12px) |
+| `ROUND_EIGHT` | Medium corner radius; standard modern UI default | 0.25rem (4px) | 0.5rem (8px) | 0.75rem (12px) | 9999px |
+| `ROUND_TWELVE` | Large corner radius ("Round 12 or full" per tool docs) | 0.5rem (8px) | 1rem (16px) | 1.5rem (24px) | 9999px |
+| `ROUND_FULL` | Fully rounded / pill-shaped corners | not observed in the measured sample — no sample project used it; read the screen's own `tailwind-config` rather than guessing | | | |
+
+Note that `rounded-full` is not a guaranteed pill under every `roundness` value: under `ROUND_FOUR` it measures 12px, not `9999px`. Only `ROUND_EIGHT` and `ROUND_TWELVE` make `full` a true pill in the measured sample.
 
 ## `deviceType` (used by `create_design_system_from_design_md`)
 

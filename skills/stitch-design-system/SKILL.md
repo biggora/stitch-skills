@@ -1,11 +1,11 @@
 ---
 name: stitch-design-system
-description: Configures visual theming and branding for Google Stitch projects through the stitch MCP server — design systems, design tokens, color palettes, primary/secondary/tertiary/neutral colors, typography, font pairings, headline and body fonts, corner radius, roundness, light mode and dark mode, spacing scales, and DESIGN.md-driven styling. Applies whenever the user wants to create or update a Stitch design system, set brand colors, pick fonts, adjust roundness or corner radius, upload or apply a DESIGN.md or brand guidelines document, apply an existing theme to screens, or make a Stitch project "match our brand," "look clean and corporate," "feel more playful," or similarly describes a visual style for Google Stitch to apply.
+description: Configures visual theming and branding for Google Stitch projects through the stitch MCP server — design systems, design tokens, color palettes, typography, font pairings, headline and body fonts, corner radius, roundness, light and dark mode, spacing scales, and DESIGN.md-driven styling. Runs in both directions — authoring a design system into Stitch, and exporting an existing one out to local files. Applies when the user wants to create or update a Stitch design system, set brand colors, pick fonts, adjust roundness or corner radius, upload or apply a DESIGN.md or brand guidelines document, apply an existing theme to screens, or says "export DESIGN.md from Stitch", "get the design tokens out of Stitch", "download the Stitch design system", "save the Stitch theme to a file", "what colors does this Stitch project use", "match our brand", "look clean and corporate", or "feel more playful".
 ---
 
 # Stitch Design System
 
-Configure and apply visual themes for Google Stitch projects via the `mcp__stitch__*` tools. This skill governs color, typography, and shape tokens — not screen content or layout (see other `stitch-*` skills for that).
+Configure and apply visual themes for Google Stitch projects via the `mcp__stitch__*` tools. This skill governs color, typography, and shape tokens — not screen content or layout (see other `stitch-*` skills for that). It runs in both directions: the sections below through "Reference files" cover *authoring* a design system into Stitch (Path A or Path B); the "Exporting a design system out of Stitch" section covers the reverse — reading an existing project's theme back out to local files.
 
 ## Two paths to a design system
 
@@ -55,6 +55,34 @@ Two traps, called out because they are easy to get backwards:
 - **`id` is the screen *instance* id, explicitly documented as NOT the source screen id.** Passing a source screen id in the `id` field will not resolve to the right screen. Both values come only from `get_project`.
 - **`assetId` (bare) vs. `name` (`assets/`-prefixed) is asymmetric across tools.** `update_design_system` takes `name` with the `assets/` prefix; `apply_design_system` takes `assetId` without it. Do not copy one value into the other tool's field unmodified — strip or add the prefix as needed.
 
+## Exporting a design system out of Stitch
+
+There is no export tool. None of the 15 `mcp__stitch__*` tools downloads a DESIGN.md or a token file — `upload_design_md` is write-only, one direction only, and has no counterpart that reads a document back out. Export means reading the `designTheme` field off a project via `get_project` and writing what you find to local files yourself. Treat "export," "download," or "save the theme" requests as this read-plus-write procedure, not as a search for a missing tool.
+
+**Before performing an export, open `references/design-export.md`.** It has the full `designTheme` field inventory (which fields are writable vs. resolved-only), a worked example producing a DESIGN.md, a CSS token file, and a Tailwind fragment from real values, the `namedColors` casing-normalization rule, and a synthesis template for when no DESIGN.md exists.
+
+Procedure, in order:
+
+1. **Resolve the project.** If you don't already have the project id, call `list_projects` (optionally with `filter: view=owned` — the default — or `view=shared`) and match it by title. Otherwise call `get_project` directly; its `name` parameter takes the **prefixed** form `projects/{id}`, unlike the bare `projectId` used elsewhere in this skill.
+2. **Read `designTheme`** off the `get_project` response.
+3. **Write the requested artefacts to disk** — see the table below for what each one is built from.
+
+| Artefact | Built from | Notes |
+|---|---|---|
+| `DESIGN.md` | `designTheme.designMd` | Only when present — see the missing-`designMd` path below. |
+| Design-tokens file (CSS custom properties, Tailwind fragment, JSON, etc.) | `namedColors` + `typography` + `spacing` + the `*FontFamily` fields + `roundness` | Your synthesized format; `references/design-export.md` has worked examples in three formats. |
+| Raw `designTheme` JSON | `designTheme` itself | A verbatim dump for reference or debugging — no transformation. |
+
+**The missing-`designMd` path.** `designTheme.designMd` is not always populated — in the account this skill was verified against, only 4 of 13 projects had one. Check for it explicitly before claiming an export succeeded. If it is absent:
+
+- Say so plainly — do not report a DESIGN.md export as done when there was nothing to export.
+- Offer to synthesize one instead, built from the resolved tokens (`namedColors`, `typography`, `spacing`, the font family fields, `roundness`) rather than the prose original. `references/design-export.md` has the synthesis template — it also says what to leave out rather than invent (brand narrative, component tone, "what to avoid" — none of that is recoverable from tokens).
+- Never emit an empty file or fabricate prose to fill the gap.
+
+**Output location.** Default to writing artefacts at the project root, or to a path the user names. Since a hand-maintained `DESIGN.md` is common, confirm with the user before overwriting an existing one rather than silently replacing it.
+
+**The round trip.** An exported (or synthesized) `DESIGN.md` can be edited locally and pushed back into Stitch through the `upload_design_md` → `create_design_system_from_design_md` pipeline this skill already documents in full in `references/design-md.md` — do not re-derive those steps here.
+
 ## Choosing theme values from a user's brief
 
 When the user describes intent rather than literal tokens, map it through this procedure:
@@ -82,6 +110,8 @@ Each pairs a distinctive headline face with a body face chosen for compatibility
 Notes on the choices: Plus Jakarta Sans is a geometric grotesque restrained enough to sit above Inter's neutral body without clashing. Space Grotesk's quirky proportions read as energetic at headline size while Work Sans stays warm and legible smaller. Playfair Display's high-contrast strokes need a plain text serif underneath, not another display face — Source Serif 4 is built for exactly that role. Anton is a headline-only face by construction (see `references/theme-enums.md`); pairing it with a neutral technical sans like IBM Plex Sans keeps body copy readable. Atkinson Hyperlegible Next is purpose-built for legibility, so it's the one recipe using the same font for both roles. Geist plus Inter is the de facto modern SaaS pairing. Newsreader's literary warmth needs a soft, rounded-terminal sans underneath — Nunito Sans — to avoid feeling stuffy.
 
 For brutalist requests wanting fully square corners, note that `ROUND_FOUR` is the smallest concrete corner value available (besides the unused `ROUND_TWO`); `ROUNDNESS_UNSPECIFIED` is the alternative if any visible rounding is unacceptable, since it leaves the value unset rather than forcing a small radius.
+
+`roundness` selects a four-step border-radius scale, not one fixed pixel value — the enum name approximates that scale's `lg` step, not a global radius applied everywhere. See `references/theme-enums.md` for the measured scale.
 
 ## Never invent enum values
 
@@ -142,3 +172,4 @@ Note `name` in call 2 carries the `assets/` prefix returned by call 1 — do not
 
 - **`references/theme-enums.md`** — open before emitting any font, `colorVariant`, `roundness`, or `deviceType` value not already copied verbatim from the recipe table in this file. It is the exhaustive, authoritative enum list. It also documents the shape of the non-enum `spacing` and `typography` maps (free-form string keys and CSS-value strings, not closed enums) — check it there too before constructing either.
 - **`references/design-md.md`** — open before starting Path B (any DESIGN.md work): base64 encoding commands per OS, the full two-call sequence, how to obtain `selectedScreenInstance`, an example DESIGN.md, and when to use a DESIGN.md versus the `theme.designMd` field on a structured system.
+- **`references/design-export.md`** — open before performing any export (the reverse direction, above): the full `designTheme` field inventory with writable-vs-resolved status, a worked example producing a DESIGN.md, a CSS token file, and a Tailwind fragment from one real theme, the `namedColors` snake_case-to-kebab-case normalization rule, and the synthesis template for a missing `designMd`.

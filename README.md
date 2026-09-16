@@ -14,38 +14,28 @@ encode those rules so the model gets them right the first time.
 |---|---|
 | `stitch-workflow` | Entry point. The end-to-end sequence, session state, and routing to the other skills. |
 | `stitch-projects` | Creating and inspecting projects; the complete identifier-format reference. |
-| `stitch-design-system` | Theme tokens, fonts, color variants, roundness, and the `DESIGN.md` pipeline. |
+| `stitch-design-system` | Theme tokens and fonts; the `DESIGN.md` pipeline **in both directions**, including export. |
 | `stitch-screens` | Generating screens from prompts, and surviving the long-running generation protocol. |
 | `stitch-iterate` | Targeted edits (`edit_screens`) and exploring alternatives (`generate_variants`). |
-| `stitch-to-code` | Turning a screen and its tokens into code that matches your project's actual stack. |
+| `stitch-components` | Downloading a screen HTML and slicing it into reusable components. |
+| `stitch-storybook` | Scaffolding Storybook, registering components as stories, composing pages. |
+| `stitch-to-code` | Turning a screen and its tokens into code that matches your project stack. |
 
-Also included: a Claude Code `stitch-batch-generator` subagent for generating several screens
-in sequence, and a settings template at
-[`examples/stitch.local.md`](examples/stitch.local.md).
-Codex runs multi-screen generation through `stitch-screens`, with a progress ledger in the
-current conversation; it does not load the Claude Code agent.
+### The design-to-Storybook pipeline
 
-## Prerequisites
+The skills chain into one route out of Stitch:
 
-A Google Stitch API key, exposed as an environment variable:
-
-```bash
-export STITCH_API_KEY="your-key-here"
+```
+Stitch project ──> DESIGN.md + design tokens      (stitch-design-system, export)
+               └─> screen HTML ──> components     (stitch-components)
+                                └─> stories ──> pages  (stitch-storybook)
 ```
 
-On Windows (PowerShell):
-
-```powershell
-[Environment]::SetEnvironmentVariable("STITCH_API_KEY", "your-key-here", "User")
-```
-
-Claude Code's [`.mcp.json`](.mcp.json) reads the key from this variable. Codex's
-[manifest](.codex-plugin/plugin.json) uses `env_http_headers` to read the same variable,
-with a 600-second tool timeout for long-running generation. **No key is stored in this
-repository.** Set the variable before starting your host, or the `stitch` MCP server will
-fail to authenticate. In PowerShell, use `$env:STITCH_API_KEY = "your-key-here"` as well
-if launching the host from the current shell; the persistent User setting applies to
-new processes after their environment is refreshed.
+Two facts drive it, both verified against the live API: `get_screen` returns a
+`htmlCode.downloadUrl` rather than inline markup, and the downloaded document is
+Tailwind-based with a resolved palette in an inline `tailwind.config`. The design system
+also exposes resolved tokens — `namedColors`, `typography`, `spacing` and real font
+family names — so tokens are read, not guessed.
 
 If you store the key in a project `.env`, load `STITCH_API_KEY` into the host's process
 environment before launching it. The plugin does not automatically load `.env` files.
